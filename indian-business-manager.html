@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BusinessHub - Smart Manager for Indian Small Businesses</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Mukta:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --primary-light: #818CF8;
+            --secondary: #10B981;
+            --secondary-dark: #059669;
+            --accent: #F59E0B;
+            --accent-pink: #EC4899;
+            --bg-light: #F8FAFC;
+            --bg-gradient: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            --bg-white: #FFFFFF;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Business Type Selection Modal */
+        #businessTypeModal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        #businessTypeModal.hidden {
+            display: none;
+        }
+
+        .business-selection-container {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .business-selection-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .business-selection-header h1 {
+            font-family: 'Mukta', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .business-selection-header p {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+        }
+
+        .business-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .business-type-card {
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .business-type-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+
+        .business-type-card.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .business-type-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .business-type-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .business-type-desc {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        .business-type-card.selected .business-type-desc {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .business-info-form {
+            background: var(--bg-light);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 107, 0, 0.3);
+        }
+
+        /* Main Dashboard */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            border-right: 1px solid var(--border);
+            padding: 2rem 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .logo {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-family: 'Mukta', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .business-info-sidebar {
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .business-info-sidebar .business-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .business-info-sidebar h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .business-info-sidebar p {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        .nav-section {
+            padding: 0 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-gray);
+            padding: 0 1rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            margin-bottom: 0.25rem;
+            border-radius: 12px;
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(255, 107, 0, 0.1) 0%, rgba(255, 107, 0, 0.05) 100%);
+            color: var(--primary);
+            font-weight: 600;
+            border-left: 3px solid var(--primary);
+        }
+
+        .nav-icon {
+            margin-right: 0.875rem;
+            font-size: 1.25rem;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .search-bar {
+            position: relative;
+            width: 400px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            font-size: 0.95rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-gray);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            background: white;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* Dashboard Content */
+        .dashboard {
+            padding: 2.5rem;
+        }
+
+        .page-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .page-title {
+            font-family: 'Mukta', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.75rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+            border-color: var(--primary-light);
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.orange { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
+        .stat-icon.blue { background: rgba(59, 130, 246, 0.1); color: var(--info); }
+        .stat-icon.yellow { background: rgba(245, 158, 11, 0.1); color: var(--accent); }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+        }
+
+        .stat-change.up {
+            background: rgba(19, 136, 8, 0.1);
+            color: var(--secondary);
+        }
+
+        .stat-change.down {
+            background: rgba(211, 47, 47, 0.1);
+            color: var(--danger);
+        }
+
+        .stat-value {
+            font-family: 'Mukta', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        /* AI Suggestions Card */
+        .suggestions-card {
+            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            border-radius: 24px;
+            padding: 2.5rem;
+            color: white;
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+        }
+
+        .suggestions-card::before {
+            content: '✨';
+            position: absolute;
+            right: 2rem;
+            top: 2rem;
+            font-size: 8rem;
+            opacity: 0.15;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.15; }
+            50% { transform: scale(1.1); opacity: 0.25; }
+        }
+
+        .suggestions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .suggestions-header h2 {
+            font-family: 'Mukta', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .ai-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .suggestion-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .suggestion-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+
+        .suggestion-desc {
+            font-size: 0.9rem;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .suggestion-impact {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-family: 'Mukta', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        /* Cost Leak Analysis */
+        .leak-item {
+            padding: 1.25rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--danger);
+        }
+
+        .leak-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .leak-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--text-dark);
+        }
+
+        .leak-amount {
+            font-family: 'Mukta', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--danger);
+        }
+
+        .leak-desc {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            margin-bottom: 0.75rem;
+        }
+
+        .leak-solution {
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+
+        /* Area Insights */
+        .insight-item {
+            padding: 1.25rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .insight-desc {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .action-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .action-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            flex-shrink: 0;
+        }
+
+        .action-content h3 {
+            font-size: 1.05rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .action-content p {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        /* Inventory Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 1rem;
+            background: var(--bg-light);
+            color: var(--text-gray);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        tbody td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        .stock-badge {
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stock-badge.low { background: rgba(211, 47, 47, 0.1); color: var(--danger); }
+        .stock-badge.medium { background: rgba(255, 160, 0, 0.1); color: var(--warning); }
+        .stock-badge.good { background: rgba(19, 136, 8, 0.1); color: var(--secondary); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Business Type Selection Modal -->
+    <div id="businessTypeModal">
+        <div class="business-selection-container">
+            <div class="business-selection-header">
+                <h1>🇮🇳 Welcome to Nile</h1>
+                <p>Choose Your Business Type to Get Started</p>
+            </div>
+
+            <div class="business-types-grid">
+                <div class="business-type-card" data-type="kirana">
+                    <div class="business-type-icon">🛒</div>
+                    <div class="business-type-name">Kirana Store</div>
+                    <div class="business-type-desc">General Store</div>
+                </div>
+
+                <div class="business-type-card" data-type="gym">
+                    <div class="business-type-icon">💪</div>
+                    <div class="business-type-name">Gym/Fitness</div>
+                    <div class="business-type-desc">Fitness Center</div>
+                </div>
+
+                <div class="business-type-card" data-type="dairy">
+                    <div class="business-type-icon">🥛</div>
+                    <div class="business-type-name">Dairy Shop</div>
+                    <div class="business-type-desc">Milk & Dairy Products</div>
+                </div>
+
+                <div class="business-type-card" data-type="restaurant">
+                    <div class="business-type-icon">🍽️</div>
+                    <div class="business-type-name">Restaurant</div>
+                    <div class="business-type-desc">Food & Dining</div>
+                </div>
+
+                <div class="business-type-card" data-type="medical">
+                    <div class="business-type-icon">💊</div>
+                    <div class="business-type-name">Medical Store</div>
+                    <div class="business-type-desc">Pharmacy</div>
+                </div>
+
+                <div class="business-type-card" data-type="salon">
+                    <div class="business-type-icon">💇</div>
+                    <div class="business-type-name">Salon/Parlour</div>
+                    <div class="business-type-desc">Beauty Services</div>
+                </div>
+
+                <div class="business-type-card" data-type="electronics">
+                    <div class="business-type-icon">📱</div>
+                    <div class="business-type-name">Electronics</div>
+                    <div class="business-type-desc">Electronic Goods</div>
+                </div>
+
+                <div class="business-type-card" data-type="garments">
+                    <div class="business-type-icon">👕</div>
+                    <div class="business-type-name">Garments</div>
+                    <div class="business-type-desc">Clothing Store</div>
+                </div>
+
+                <div class="business-type-card" data-type="bakery">
+                    <div class="business-type-icon">🍰</div>
+                    <div class="business-type-name">Bakery</div>
+                    <div class="business-type-desc">Bakery & Confectionery</div>
+                </div>
+
+                <div class="business-type-card" data-type="hardware">
+                    <div class="business-type-icon">🔧</div>
+                    <div class="business-type-name">Hardware</div>
+                    <div class="business-type-desc">Hardware Store</div>
+                </div>
+
+                <div class="business-type-card" data-type="autoparts">
+                    <div class="business-type-icon">🚗</div>
+                    <div class="business-type-name">Auto Parts</div>
+                    <div class="business-type-desc">Automobile Parts</div>
+                </div>
+
+                <div class="business-type-card" data-type="other">
+                    <div class="business-type-icon">🏪</div>
+                    <div class="business-type-name">Other</div>
+                    <div class="business-type-desc">Other Business</div>
+                </div>
+            </div>
+
+            <div class="business-info-form">
+                <h3 style="margin-bottom: 1.5rem;">Business Information</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Business Name</label>
+                        <input type="text" id="businessName" placeholder="Raj Kirana Store">
+                    </div>
+                    <div class="form-group">
+                        <label>Owner Name</label>
+                        <input type="text" id="ownerName" placeholder="Rajesh Kumar">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" id="city" placeholder="Mumbai">
+                    </div>
+                    <div class="form-group">
+                        <label>Area/Locality</label>
+                        <input type="text" id="area" placeholder="Andheri West">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        <input type="tel" id="mobile" placeholder="+91 98765 43210">
+                    </div>
+                    <div class="form-group">
+                        <label>Business Start Date</label>
+                        <input type="date" id="startDate">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="startBusiness()">
+                    Start Managing Business
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="sidebar">
+        <div class="logo">
+            <h1>🇮🇳 NILE</h1>
+        </div>
+
+        <div class="business-info-sidebar">
+            <div class="business-icon">🛒</div>
+            <h3 id="sidebarBusinessName">Raj Kirana Store</h3>
+            <p id="sidebarBusinessType">Kirana Store</p>
+            <p id="sidebarBusinessLocation" style="font-size: 0.8rem;">📍 Andheri West, Mumbai</p>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Main</div>
+            <div class="nav-item active" data-page="dashboard">
+                <span class="nav-icon">📊</span>
+                Dashboard
+            </div>
+            <div class="nav-item" data-page="inventory">
+                <span class="nav-icon">📦</span>
+                Inventory
+                <span class="badge">5</span>
+            </div>
+            <div class="nav-item" data-page="sales">
+                <span class="nav-icon">💰</span>
+                Sales
+            </div>
+            <div class="nav-item" data-page="customers">
+                <span class="nav-icon">👥</span>
+                Customers
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Analytics</div>
+            <div class="nav-item" data-page="suggestions">
+                <span class="nav-icon">✨</span>
+                AI Suggestions
+            </div>
+            <div class="nav-item" data-page="leaks">
+                <span class="nav-icon">⚠️</span>
+                Cost Leaks
+                <span class="badge">3</span>
+            </div>
+            <div class="nav-item" data-page="area-insights">
+                <span class="nav-icon">📍</span>
+                Area Insights
+            </div>
+            <div class="nav-item" data-page="reports">
+                <span class="nav-icon">📈</span>
+                Reports
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Management</div>
+            <div class="nav-item" data-page="expenses">
+                <span class="nav-icon">💸</span>
+                Expenses
+            </div>
+            <div class="nav-item" data-page="suppliers">
+                <span class="nav-icon">🚚</span>
+                Suppliers
+            </div>
+            <div class="nav-item" data-page="settings">
+                <span class="nav-icon">⚙️</span>
+                Settings
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="Search products, customers, inventory...">
+            </div>
+
+            <div class="header-actions">
+                <div class="icon-btn">
+                    <span>🔔</span>
+                    <span class="notification-dot"></span>
+                </div>
+                <div class="icon-btn">
+                    <span>💬</span>
+                </div>
+                <div class="icon-btn">
+                    <span>👤</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard" id="mainDashboard">
+            <!-- Content will be loaded dynamically -->
+        </div>
+    </div>
+
+    <script src="indian-business-manager.js"></script>
+</body>
+</html>
